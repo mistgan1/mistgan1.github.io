@@ -1,0 +1,57 @@
+<html>
+<style>
+
+body {
+	background: url(http://images.vfl.ru/ii/1533602952/c0986cac/22790087.jpg); 
+	background-size: 100% auto;
+	 }
+body:after{
+	content: '';
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity:0.5;
+	background-image: url(http://images.vfl.ru/ii/1542396860/83e76322/24229829.png), url(http://images.vfl.ru/ii/1542396860/83e76322/24229829.png), url(http://images.vfl.ru/ii/1542396860/83e76322/24229829.png);
+    background-size: 200px, 350px, 250px;
+    animation: snow 20s linear infinite;
+}
+@keyframes snow {
+ 0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+ 100% {background-position: 500px 1000px, 400px 400px, 300px 300px;}
+}
+@keyframes snow {
+ 0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+ 100% {background-position: 500px 1000px, 400px 400px, 300px 300px;}
+}
+ 
+@-moz-keyframes snow {
+ 0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+ 100% {background-position: 500px 1000px, 400px 400px, 300px 300px;}
+}
+ 
+@-webkit-keyframes snow {
+0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+ 100% {background-position: 500px 1000px, 400px 400px, 300px 300px;}
+}
+ 
+@-ms-keyframes snow {
+ 0% {background-position: 0px 0px, 0px 0px, 0px 0px;}
+ 100% {background-position: 500px 1000px, 400px 400px, 300px 300px;}
+}
+div#wrapper {
+ background-image: url('snowflake.png'), url('snowflake3.png'), url('snowflake2.png');
+ height:100%;
+ -webkit-animation: snow 20s linear infinite;
+ -moz-animation: snow 20s linear infinite;
+ -ms-animation: snow 20s linear infinite;
+ animation: snow 20s linear infinite;
+}
+</style>
+<head>
+	<link rel="stylesheet" href="snow.css">
+</head>
+<body>
+</body>
+</html>
