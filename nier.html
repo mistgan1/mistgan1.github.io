@@ -4,11 +4,6 @@
 body {
 	background: url(http://images.vfl.ru/ii/1533602952/c0986cac/22790087.jpg); 
 	background-size: 100% auto;
-	<form name="test" method="post" action="input1.php">
-  	<p><b>Разгаданное слово:</b><br>
-   	<input type="text" size="40"></p>
-  	<input type="submit" value="Отправить">
- 	</form>
 }
 body:after{
 	content: '';
@@ -58,5 +53,15 @@ div#wrapper {
 	<link rel="stylesheet" href="snow.css">
 </head>
 <body>
+  <script>
+  let year = prompt('Введи разгаданное слово', '');
+
+if (year == 'goodjob' || year == 'Goodjob' || year == 'good job' || year == 'Good job') {
+  alert( 'Да вы знаток!' );
+} else {
+  alert( 'Неверно, разгадывай дальше)\nF5 для повторного вызова формы' ); // любое значение, кроме 2015
+}
+  </script>
+</form>
 </body>
 </html>
