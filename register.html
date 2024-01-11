@@ -85,19 +85,33 @@
             <form id="form">
                 <input type="text" placeholder="Никнейм" id="user_name">
             </form>
+        <div id ="error"></div>
         <button id="register">Зарегистрироваться</button>
     </div>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<!--    <script>-->
-<!--     let tg = window.Telegram.WebApp;-->
-<!--     let register = document.getElementById("register");-->
+    <script>
+     let tg = window.Telegram.WebApp;
+     let register = document.getElementById("register");
+     tg.expand();
 
-<!--     register.addEventListener("click", () => {-->
+     register.addEventListener("click", () => {
+        document.getElementById("error").innerText = '';
+        let name = document.getElementById("user_name").value;
+        if(name.length < 3) {
+            document.getElementById("error").innerText = 'Никнейм не может быть короче 3 символов';
+            return;
+        }
 
+        let data = {
+            name: name
+        }
 
-<!--     });-->
-<!--    </script>>-->
+        tg.sendData(JSON.stringify(data));
+
+        tg.close();
+     });
+    </script>>
 
 </body>
 </html>
