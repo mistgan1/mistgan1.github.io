@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подсчет подарков и выигрышей</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%;
+        }
+        .input-section, .result-section {
+            margin: 10px;
+        }
+        textarea, input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <select id="mode-selector" onchange="toggleMode()">
+                <option value="gifts">Подарки</option>
+                <option value="casino">Казино</option>
+            </select>
+            <textarea id="text-input" rows="10" placeholder="Вставьте текст из документа"></textarea>
+            <div id="gifts-inputs">
+                <input type="text" id="giver" placeholder="Кто подарил">
+                <input type="text" id="receiver" placeholder="Кому подарил">
+            </div>
+            <button onclick="calculate()">Посчитать</button>
+        </div>
+        <div class="result-section">
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMode() {
+            const mode = document.getElementById('mode-selector').value;
+            const giftsInputs = document.getElementById('gifts-inputs');
+            if (mode === 'casino') {
+                giftsInputs.style.display = 'none';
+            } else {
+                giftsInputs.style.display = 'block';
+            }
+        }
+
+        function calculate() {
+            const mode = document.getElementById('mode-selector').value;
+            if (mode === 'gifts') {
+                calculateGifts();
+            } else if (mode === 'casino') {
+                calculateCasino();
+            }
+        }
+
+        function calculateGifts() {
+            const text = document.getElementById('text-input').value;
+            const giver = document.getElementById('giver').value;
+            const receiver = document.getElementById('receiver').value;
+
+            const result = {
+                gold: 0,
+                mana: 0,
+                coupons: 0,
+                pills: 0,
+                lockpicks: 0
+            };
+
+            if (giver && receiver) {
+                const patterns = [
+                    `{00FF00}${giver}{00FFFF} дарит ману {00FF00}${receiver}{00FFFF}!`,
+                    `{00FF00}${giver}{00FFFF} дарит золото {00FF00}${receiver}{00FFFF}!`,
+                    `{00FF00}${giver}{00FFFF} дарит отмычки {00FF00}${receiver}{00FFFF}!`,
+                    `{00FF00}${giver}{00FFFF} дарит купон {00FF00}${receiver}{00FFFF}!`,
+                    `{00FF00}${giver}{00FFFF} дарит пилюлю {00FF00}${receiver}{00FFFF}!`
+                ];
+
+                patterns.forEach((pattern, index) => {
+                    const regex = new RegExp(pattern, 'g');
+                    const matches = text.match(regex);
+                    if (matches) {
+                        switch (index) {
+                            case 0:
+                                result.mana += matches.length * 100;
+                                break;
+                            case 1:
+                                result.gold += matches.length;
+                                break;
+                            case 2:
+                                result.lockpicks += matches.length;
+                                break;
+                            case 3:
+                                result.coupons += matches.length;
+                                break;
+                            case 4:
+                                result.pills += matches.length;
+                                break;
+                        }
+                    }
+                });
+            } else if (!giver && receiver) {
+                const patterns = [
+                    `.* дарит ману {00FF00}${receiver}{00FFFF}!`,
+                    `.* дарит золото {00FF00}${receiver}{00FFFF}!`,
+                    `.* дарит отмычки {00FF00}${receiver}{00FFFF}!`,
+                    `.* дарит купон {00FF00}${receiver}{00FFFF}!`,
+                    `.* дарит пилюлю {00FF00}${receiver}{00FFFF}!`
+                ];
+
+                patterns.forEach((pattern, index) => {
+                    const regex = new RegExp(pattern, 'g');
+                    const matches = text.match(regex);
+                    if (matches) {
+                        switch (index) {
+                            case 0:
+                                result.mana += matches.length * 100;
+                                break;
+                            case 1:
+                                result.gold += matches.length;
+                                break;
+                            case 2:
+                                result.lockpicks += matches.length;
+                                break;
+                            case 3:
+                                result.coupons += matches.length;
+                                break;
+                            case 4:
+                                result.pills += matches.length;
+                                break;
+                        }
+                    }
+                });
+            } else if (giver && !receiver) {
+                const pattern = `{00FF00}${giver}{00FFFF} дарит .*`;
+                const regex = new RegExp(pattern, 'g');
+                const matches = text.match(regex);
+                if (matches) {
+                    matches.forEach(match => {
+                        if (match.includes('ману')) {
+                            result.mana += 100;
+                        } else if (match.includes('золото')) {
+                            result.gold += 1;
+                        } else if (match.includes('отмычки')) {
+                            result.lockpicks += 1;
+                        } else if (match.includes('купон')) {
+                            result.coupons += 1;
+                        } else if (match.includes('пилюлю')) {
+                            result.pills += 1;
+                        }
+                    });
+                }
+            }
+
+            const totalGifts = result.gold + (result.mana / 100) + result.coupons + result.pills + result.lockpicks;
+
+            document.getElementById('result').innerHTML = `
+                ${giver ? giver : 'Кто-то'} подарил ${receiver ? receiver : 'кому-то'}<br>
+                ${result.gold} золота<br>
+                ${result.mana} маны<br>
+                ${result.coupons} купонов<br>
+                ${result.pills} пилюль<br>
+                ${result.lockpicks} отмычек<br>
+                <br>
+                Общее количество подарков: ${totalGifts}
+            `;
+        }
+
+		function calculateCasino() {
+			const text = document.getElementById('text-input').value;
+			const winPattern = /Выигрыш:\s*([\d\s]*)\s*([а-яА-ЯёЁa-zA-Z\s]+?)!/gi;
+			const losePattern = /Не повезло!/gi;
+
+			let winMatches = text.match(winPattern) || [];
+			let loseMatches = text.match(losePattern) || [];
+
+			const prizes = {};
+			let totalPrizes = 0; // Общий счетчик всех призов
+
+			winMatches.forEach(match => {
+				const prizePattern = /Выигрыш:\s*([\d\s]*)\s*([а-яА-ЯёЁa-zA-Z\s]+?)!/i;
+				const [, count, item] = prizePattern.exec(match);
+				const quantity = determinePrizeQuantity(count.replace(/\s+/g, '')); // Используем функцию для определения количества
+				const normalizedItem = normalizeItem(item.trim().toLowerCase()); // Нормализация названия приза
+
+				totalPrizes += quantity; // Увеличиваем общий счетчик призов
+
+				if (normalizedItem in prizes) {
+					prizes[normalizedItem] += quantity;
+				} else {
+					prizes[normalizedItem] = quantity;
+				}
+			});
+
+			const totalAttempts = winMatches.length + loseMatches.length;
+			const winPercentage = Math.round((winMatches.length / totalAttempts) * 100); // Процент выигрыша
+			const moneySpent100k = formatNumber(totalAttempts * 100000); // Стоимость всех попыток на 100 000
+			const moneySpent10k = formatNumber(totalAttempts * 10000); // Стоимость всех попыток на 10 000
+
+			// Сортируем призы по проценту
+			const sortedPrizes = Object.entries(prizes).map(([item, count]) => {
+				const prizePercentage = ((count / totalPrizes) * 100).toFixed(1); // Процент для каждого приза
+				return { item, count, prizePercentage };
+			}).sort((a, b) => b.prizePercentage - a.prizePercentage); // Сортировка от большего к меньшему
+
+			let prizeSummary = '';
+			sortedPrizes.forEach(({ item, count, prizePercentage }) => {
+				let prizeString = `${formatNumber(count)} ${item} (${prizePercentage}%)`;
+				if (item === 'виртов') {
+					prizeString += ' (кол-во джекпотов по 100к или 500к)'; // Добавляем сообщение для виртов
+				}
+				prizeSummary += `${prizeString}<br>`;
+			});
+
+			document.getElementById('result').innerHTML = `
+				Количество попыток: ${formatNumber(totalAttempts)}<br>
+				Потрачено денег: ${moneySpent100k}$ (на 100 000), ${moneySpent10k}$ (на 10 000)<br>
+				Количество неудачных попыток: ${loseMatches.length}<br>
+				Количество выигрышей: ${winMatches.length}<br>
+				Процент выигрыша: ${winPercentage}%<br>
+				<br>
+				Выигранные призы:<br>
+				${prizeSummary}
+			`;
+		}
+
+		// Функция определения количества приза (для учета виртов)
+		function determinePrizeQuantity(count) {
+			const quantity = parseInt(count) || 1; // Убираем пробелы в числах для корректного парсинга
+
+			// Если речь идет о виртах, пересчитываем в единицы
+			if (quantity >= 500000 || quantity === 100000) {
+				return 1; // 500 000 вирт и 100 000 вирт = 1 единица
+			}
+			return quantity; // Возвращаем количество для всех остальных призов
+		}
+
+		// Функция нормализации названия предмета
+		function normalizeItem(item) {
+			// Примеры нормализации для устранения различных окончаний
+			const replacements = {
+				'кристалла': 'кристаллов',
+				'кристалл': 'кристаллов',
+				'отмычка': 'отмычек',
+				'самородка': 'самородков',
+				'пилюля': 'пилюль',
+				'зелье': 'зелья',
+				'торт': 'тортов',
+				'вирт': 'виртов',
+				// Добавьте другие слова, которые требуют нормализации
+			};
+
+			return replacements[item] || item; // Возвращаем нормализованное значение или оригинальное слово, если его нет в списке
+		}
+
+		// Функция форматирования чисел с разделением каждых 3 символов пробелами
+		function formatNumber(number) {
+			return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+		}
+    </script>
+</body>
+</html>

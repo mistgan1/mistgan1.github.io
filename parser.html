@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Парсер чатов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 70%;
+        }
+        .input-section, .result-section {
+            margin: 10px;
+        }
+        textarea, input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .checkboxes {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .checkboxes label {
+            margin-right: 10px;
+        }
+        .scrollable-result {
+            max-height: 300px;
+            overflow-y: auto;
+            background-color: #e0e0e0; /* затемнённый фон */
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .time {
+            color: #4F4F4F;
+            font-size: 10px;
+            padding: 2px;
+            margin: 2px;
+            background: #121212;
+            border-radius: 15px;
+            border-top-right-radius: 0px;
+            border-bottom-right-radius: 0px;
+            border: 1px solid #323232;
+            opacity: 0.5;
+        }
+        .time:hover {
+            opacity: 1;
+        }
+        .message {
+            margin-bottom: 3px;
+            background: #020202;
+            border: 1px solid rgba(50, 50, 50, 0.19);
+            border-radius: 17px;
+            padding: 5px;
+        }
+        .message:hover {
+            background: #0F0F0F;
+        }
+        .vip-message {
+            color: #FFA500; /* Оранжевый цвет для VIP сообщений */
+        }
+		button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+	<div class="container">
+		<div class="input-section">
+			<div class="checkboxes">
+				<label><input type="checkbox" id="all-chats"> Все чаты</label>
+				<label><input type="checkbox" id="vip-chat"> Вип-чат</label>
+				<label><input type="checkbox" id="dark-chat"> /ф темные</label>
+				<label><input type="checkbox" id="zombie-chat"> /ф зомби</label>
+				<label><input type="checkbox" id="defense-chat"> /р защиты</label>
+				<label><input type="checkbox" id="attack-chat" onchange="toggleExclusiveCheckboxes('attack')"> /р нападения</label>
+				<label><input type="checkbox" id="zombie-attack-chat" onchange="toggleExclusiveCheckboxes('zombie-attack')"> /р нападения только зомби</label>
+				<label><input type="checkbox" id="dark-attack-chat" onchange="toggleExclusiveCheckboxes('dark-attack')"> /р нападения только темные</label>
+				<label><input type="checkbox" id="punishments-chat"> Наказания</label>
+			</div>
+			<textarea id="text-input" rows="10" placeholder="Вставьте текст из документа"></textarea>
+			<button onclick="parseText()">Парсить</button>
+		</div>
+		<div class="result-section">
+			<div id="result" class="scrollable-result"></div>
+		</div>
+	</div>
+
+    <script>
+        function toggleMode() {
+            const mode = document.getElementById('mode-selector').value;
+            const chatOptions = document.getElementById('chat-options');
+            chatOptions.style.display = (mode === 'chat_parser') ? 'block' : 'none';
+        }
+
+        function toggleExclusiveCheckboxes(activeCheckbox) {
+            const attackCheckbox = document.getElementById('attack-chat');
+            const zombieAttackCheckbox = document.getElementById('zombie-attack-chat');
+            const darkAttackCheckbox = document.getElementById('dark-attack-chat');
+
+            if (activeCheckbox === 'attack') {
+                zombieAttackCheckbox.checked = false;
+                darkAttackCheckbox.checked = false;
+            } else if (activeCheckbox === 'zombie-attack') {
+                attackCheckbox.checked = false;
+            } else if (activeCheckbox === 'dark-attack') {
+                attackCheckbox.checked = false;
+            }
+        }
+		
+		function toggleAllChats() {
+			const allChatsCheckbox = document.getElementById('all-chats');
+			const chatCheckboxes = document.querySelectorAll('.checkboxes input[type="checkbox"]:not(#all-chats)');
+
+			chatCheckboxes.forEach(checkbox => {
+				checkbox.checked = allChatsCheckbox.checked;
+			});
+		}
+
+		// Обновляем обработчик для чекбокса "Все чаты"
+		document.getElementById('all-chats').addEventListener('change', toggleAllChats);
+
+
+		function parseText() {
+			const text = document.getElementById('text-input').value;
+			const vipChatChecked = document.getElementById('vip-chat').checked;
+			const attackChatChecked = document.getElementById('attack-chat').checked;
+			const zombieAttackChatChecked = document.getElementById('zombie-attack-chat').checked;
+			const darkAttackChatChecked = document.getElementById('dark-attack-chat').checked;
+			const defenseChatChecked = document.getElementById('defense-chat').checked;
+			const punishmentsChatChecked = document.getElementById('punishments-chat').checked;
+			const zombieChatChecked = document.getElementById('zombie-chat').checked; // Новый чекбокс для зомби
+			const darkChatChecked = document.getElementById('dark-chat').checked; // Новый чекбокс для темных
+
+			const resultContainer = document.getElementById('result');
+			resultContainer.innerHTML = '';
+
+			const lines = text.split('\n');
+			const uniqueLines = new Set(); // Для отслеживания уникальных строк
+
+			lines.forEach(line => {
+				let formattedLine = '';
+
+				// Проверка на вип-чат
+				if (vipChatChecked && line.includes('VIP-')) {
+					formattedLine = formatVipLine(line);
+				}
+
+				// Проверка на атаки
+				if (attackChatChecked) {
+					const attackRegex = /^\[(.*?)\] \[Р\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
+					const attackMatch = line.match(attackRegex);
+					if (attackMatch && (attackMatch[2] === '3E3E3E' || attackMatch[2] === '9BFF22')) {
+						formattedLine = formatLineWithColors(attackMatch);
+					}
+				}
+
+				// Проверка на зомби атаки
+				if (zombieAttackChatChecked) {
+					const zombieAttackRegex = /^\[(.*?)\] \[Р\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
+					const zombieAttackMatch = line.match(zombieAttackRegex);
+					if (zombieAttackMatch && zombieAttackMatch[2] === '9BFF22') {
+						formattedLine = formatLineWithColors(zombieAttackMatch);
+					}
+				}
+
+				// Проверка на темные атаки
+				if (darkAttackChatChecked) {
+					const darkAttackRegex = /^\[(.*?)\] \[Р\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
+					const darkAttackMatch = line.match(darkAttackRegex);
+					if (darkAttackMatch && darkAttackMatch[2] === '3E3E3E') {
+						formattedLine = formatLineWithColors(darkAttackMatch);
+					}
+				}
+
+				// Проверка на защиту
+				if (defenseChatChecked) {
+					const defenseRegex = /^\[(.*?)\] \[Р\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
+					const defenseMatch = line.match(defenseRegex);
+					if (defenseMatch && (defenseMatch[2] === 'FFFF80' || defenseMatch[2] === '447B5A' || defenseMatch[2] === '408080')) {
+						formattedLine = formatLineWithColors(defenseMatch);
+					}
+				}
+
+				// Проверка на сообщения зомби
+				if (zombieChatChecked) {
+					if (line.includes('[Ф] Зомби') || line.includes('[Ф] Высший Зомби')) {
+						formattedLine = `<span style="color: #6B8E23;">${line}</span>`; // Цвет болотно-зелёный
+					}
+				}
+				
+				// Проверка на сообщения темных
+				if (darkChatChecked) {
+					if (line.includes('[Ф] Темный') || line.includes('[Ф] Высший Демон')) {
+						formattedLine = `<span style="color: #556B2F;">${line}</span>`; // болотно-зелёный цвет
+					}
+				}
+				
+				// Проверка на наказания
+				if (punishmentsChatChecked) {
+					if (line.includes('Администратор Aleksey_Barsow')) {
+						const punishmentMessage = line.replace(/.*?Администратор Aleksey_Barsow/, 'Администратор Aleksey_Barsow');
+						formattedLine = `<span style="color: orange;">${punishmentMessage}</span>`;
+					} else if (line.includes('Администратор Plohish')) {
+						const punishmentMessage = line.replace(/.*?Администратор Plohish/, 'Администратор Plohish');
+						formattedLine = `<span style="color: orange;">${punishmentMessage}</span>`;
+					}
+				}
+
+				// Если строка не пуста и уникальна, отображаем её
+				if (formattedLine && !uniqueLines.has(formattedLine)) {
+					uniqueLines.add(formattedLine); // Добавляем строку в набор уникальных строк
+					displayMessage(line, formattedLine);
+				}
+			});
+		}
+
+
+        function formatVipLine(line) {
+            // Форматируем VIP сообщение, извлекая цветовые коды и текст
+            const vipRegex = /^\[(.*?)\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
+            const vipMatch = line.match(vipRegex);
+            let formattedLine = line; // По умолчанию без изменений
+
+            if (vipMatch) {
+                formattedLine = formatLineWithColors(vipMatch);
+                formattedLine = `<span class="vip-message">${formattedLine}</span>`;
+            }
+            return formattedLine;
+        }
+
+        function formatLineWithColors(match) {
+            const color1 = match[2];
+            const text1 = match[3];
+            const color2 = match[5];
+            const text2 = match[6];
+
+            let formattedLine = `<span style="color: #${color1};">${text1}</span>`;
+            if (color2 && text2) {
+                formattedLine += `<span style="color: #${color2};"> ${text2}</span>`;
+            }
+            return formattedLine;
+        }
+
+        function displayMessage(originalLine, formattedMessage) {
+            // Получаем время из строки
+            const timeMatch = originalLine.match(/^\[(\d\d:\d\d:\d\d)\]/);
+            const time = timeMatch ? timeMatch[1] : '00:00:00';
+
+            const resultContainer = document.getElementById('result');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerHTML = `<span class="time">${time}</span> ${formattedMessage}`;
+            resultContainer.appendChild(messageDiv);
+        }
+	
+    </script>
+</body>
+</html>
