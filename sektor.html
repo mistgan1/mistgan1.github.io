@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -13,6 +14,17 @@
             height: 100vh;
             margin: 0;
             background-color: #f0f0f0;
+        }
+		.gif-container {
+            position: absolute;
+            top: 10px; /* Отступ сверху */
+            left: 50%;
+            transform: translateX(-50%); /* Центрирование по горизонтали */
+        }
+
+        img {
+            width: 100px; /* Задаем нужную ширину */
+            height: auto;
         }
         .container {
             display: flex;
@@ -51,6 +63,9 @@
     </style>
 </head>
 <body>
+    <div class="gif-container">
+        <img src="duck2.gif" alt="GIF">
+    </div>
     <div class="container">
         <div class="input-section">
             <select id="mode-selector" onchange="toggleMode()">

@@ -14,6 +14,17 @@
             margin: 0;
             background-color: #f0f0f0;
         }
+		.gif-container {
+            position: absolute;
+            top: 10px; /* Отступ сверху */
+            left: 50%;
+            transform: translateX(-50%); /* Центрирование по горизонтали */
+        }
+
+        img {
+            width: 100px; /* Задаем нужную ширину */
+            height: auto;
+        }
         .video-background {
             position: absolute;
             top: 0;
@@ -106,12 +117,15 @@
     </style>
 </head>
 <body>
-    <div class="video-background">
+    <div class="gif-container">
+        <img src="duck1.gif" alt="GIF">
+    </div>
+    <!-- <div class="video-background">
         <video autoplay muted loop>
             <source src="evo.mp4" type="video/mp4">
             Ваш браузер не поддерживает видео.
         </video>
-    </div>
+    </div>-->
 	<div class="container">
 		<div class="input-section">
 			<div class="checkboxes">
