@@ -129,15 +129,20 @@
 	<div class="container">
 		<div class="input-section">
 			<div class="checkboxes">
-				<label><input type="checkbox" id="all-chats"> Все чаты</label>
-				<label><input type="checkbox" id="vip-chat"> Вип-чат</label>
-				<label><input type="checkbox" id="dark-chat"> /ф темные</label>
-				<label><input type="checkbox" id="zombie-chat"> /ф зомби</label>
-				<label><input type="checkbox" id="defense-chat"> /р защиты</label>
-				<label><input type="checkbox" id="attack-chat" onchange="toggleExclusiveCheckboxes('attack')"> /р нападения</label>
-				<label><input type="checkbox" id="zombie-attack-chat" onchange="toggleExclusiveCheckboxes('zombie-attack')"> /р нападения только зомби</label>
-				<label><input type="checkbox" id="dark-attack-chat" onchange="toggleExclusiveCheckboxes('dark-attack')"> /р нападения только темные</label>
-				<label><input type="checkbox" id="punishments-chat"> Наказания</label>
+				<label><input type="checkbox" id="all-chats">Все чаты</label>
+				<label><input type="checkbox" id="vip-chat">Вип-чат</label>
+				<label><input type="checkbox" id="dark-chat">/ф темные</label>
+				<label><input type="checkbox" id="zombie-chat">/ф зомби</label>
+				<label><input type="checkbox" id="defense-chat">/р защиты</label>
+				<label><input type="checkbox" id="attack-chat" onchange="toggleExclusiveCheckboxes('attack')">/р нападения</label>
+				<label><input type="checkbox" id="zombie-attack-chat" onchange="toggleExclusiveCheckboxes('zombie-attack')">/р нападения только зомби</label>
+				<label><input type="checkbox" id="dark-attack-chat" onchange="toggleExclusiveCheckboxes('dark-attack')">/р нападения только темные</label>
+				<label><input type="checkbox" id="punishments-chat">Наказания</label>
+				<label><input type="checkbox" id="strazhi-chat">Стражи (эфир)</label>
+				<label><input type="checkbox" id="strazhi-answer">Стражи (ответ)</label>
+			</div>
+			<div>
+				<input type="text" id="text-input-search" placeholder="Введите текст для поиска... (не подсвечивает результаты в уже активных фильтрах)">
 			</div>
 			<textarea id="text-input" rows="10" placeholder="Вставьте текст из документа"></textarea>
 			<button onclick="parseText()">Парсить</button>
@@ -184,6 +189,7 @@
 
 		function parseText() {
 			const text = document.getElementById('text-input').value;
+			const text_search = document.getElementById('text-input-search').value;
 			const vipChatChecked = document.getElementById('vip-chat').checked;
 			const attackChatChecked = document.getElementById('attack-chat').checked;
 			const zombieAttackChatChecked = document.getElementById('zombie-attack-chat').checked;
@@ -192,7 +198,10 @@
 			const punishmentsChatChecked = document.getElementById('punishments-chat').checked;
 			const zombieChatChecked = document.getElementById('zombie-chat').checked; // Новый чекбокс для зомби
 			const darkChatChecked = document.getElementById('dark-chat').checked; // Новый чекбокс для темных
-
+			const strazhiChatChecked = document.getElementById('strazhi-chat').checked; 
+			const strazhiAnswerChecked = document.getElementById('strazhi-answer').checked; 
+			
+			
 			const resultContainer = document.getElementById('result');
 			resultContainer.innerHTML = '';
 
@@ -202,6 +211,16 @@
 			lines.forEach(line => {
 				let formattedLine = '';
 
+				// Проверка на текст, введённый пользователем
+				if (text_search && line.toLowerCase().includes(text_search.toLowerCase())) {
+					const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+					const lineWithColors = lineWithoutTime.replace(/\{([A-Fa-f0-9]{6})\}/g, '<span style="color: #$1">').replace(/}/g, '</span>');
+					const regex = new RegExp(`(${text_search})`, 'gi');
+					const highlightedLine = lineWithColors.replace(regex, '<span style="background-color: yellow;">$1</span>');
+					formattedLine = `${highlightedLine}`;
+				}
+
+				
 				// Проверка на вип-чат
 				if (vipChatChecked && line.includes('VIP-')) {
 					formattedLine = formatVipLine(line);
@@ -267,6 +286,44 @@
 						formattedLine = `<span style="color: orange;">${punishmentMessage}</span>`;
 					}
 				}
+				
+				// Проверка на эфир
+				if (strazhiChatChecked) {
+					if (line.includes('< Страж > ')) {
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+						formattedLine = `<span style="color: #DEB887;">${lineWithoutTime}</span>`; // Цвет эфира
+					}
+				}
+				
+				// Проверка на ответ
+				if (strazhiAnswerChecked) {
+					if (line.includes("Вопрос от")) {
+						questionLine = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '').trim();
+					}
+
+					// Исправленное регулярное выражение
+					const strazhiAnswerRegex = /^\[(\d{2}:\d{2}:\d{2})\] \{([A-Fa-f0-9]{6})\}Страж ([^ ]+) ответил ([^ ]+)\[(\d+)\]:\{([A-Fa-f0-9]{6})\} (.+)$/;
+					const strazhiMatch = line.match(strazhiAnswerRegex);
+										
+					
+					if (strazhiMatch) {
+						// Разбираем результат на части
+						const time = strazhiMatch[1];          // Время
+						const strazhiColor = strazhiMatch[2];  // Цвет Стража
+						const strazhiName = strazhiMatch[3];   // Имя Стража
+						const targetName = strazhiMatch[4];    // Имя того, кому ответили
+						const targetNumber = strazhiMatch[5];  // Число в квадратных скобках
+						const answerColor = strazhiMatch[6];   // Цвет ответа
+						const answerText = strazhiMatch[7];    // Текст ответа
+
+						// Убираем время из строки
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+
+						// Форматируем строку с цветами и вставляем все части
+						formattedLine = `<span style="color: #DEB887;">${questionLine}</span><br><span style="color: #${strazhiColor}">Страж ${strazhiName} ответил ${targetName}[${targetNumber}]: </span> <span style="color: #${answerColor}"> ${answerText}</span>`;
+					}
+				}
+
 
 				// Если строка не пуста и уникальна, отображаем её
 				if (formattedLine && !uniqueLines.has(formattedLine)) {
