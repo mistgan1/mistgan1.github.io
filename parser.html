@@ -216,7 +216,7 @@
 					const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
 					const lineWithColors = lineWithoutTime.replace(/\{([A-Fa-f0-9]{6})\}/g, '<span style="color: #$1">').replace(/}/g, '</span>');
 					const regex = new RegExp(`(${text_search})`, 'gi');
-					const highlightedLine = lineWithColors.replace(regex, '<span style="background-color: yellow;">$1</span>');
+					const highlightedLine = lineWithColors.replace(regex, '<span style="background-color: lightblue;">$1</span>');
 					formattedLine = `${highlightedLine}`;
 				}
 
