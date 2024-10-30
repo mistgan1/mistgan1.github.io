@@ -140,6 +140,7 @@
 				<label><input type="checkbox" id="punishments-chat">Наказания</label>
 				<label><input type="checkbox" id="strazhi-chat">Стражи (эфир)</label>
 				<label><input type="checkbox" id="strazhi-answer">Стражи (ответ)</label>
+				<label><input type="checkbox" id="attack-logs">Логи атак</label>
 			</div>
 			<div>
 				<input type="text" id="text-input-search" placeholder="Введите текст для поиска... (не подсвечивает результаты в уже активных фильтрах)">
@@ -200,7 +201,7 @@
 			const darkChatChecked = document.getElementById('dark-chat').checked; // Новый чекбокс для темных
 			const strazhiChatChecked = document.getElementById('strazhi-chat').checked; 
 			const strazhiAnswerChecked = document.getElementById('strazhi-answer').checked; 
-			
+			const attackLogsChecked = document.getElementById('attack-logs').checked; 
 			
 			const resultContainer = document.getElementById('result');
 			resultContainer.innerHTML = '';
@@ -323,7 +324,52 @@
 						formattedLine = `<span style="color: #DEB887;">${questionLine}</span><br><span style="color: #${strazhiColor}">Страж ${strazhiName} ответил ${targetName}[${targetNumber}]: </span> <span style="color: #${answerColor}"> ${answerText}</span>`;
 					}
 				}
-
+				
+				// Проверка на лог атак
+				if (attackLogsChecked) {
+					if (line.includes('Атака от:')) {
+						let BodyPart = "";
+						let gun = "???";
+						
+						
+						if (line.includes('оружие: 31')) {
+							gun = "m4";
+						} else if (line.includes('оружие: 38')) {
+							gun = "minigun";
+						} else if (line.includes('оружие: 34')) {
+							gun = "sniper rifle";
+						} else if (line.includes('оружие: 28')) {
+							gun = "uzi";
+						} else if (line.includes('оружие: 32')) {
+							gun = "tec9";
+						} else if (line.includes('оружие: 29')) {
+							gun = "mp5";
+						} else if (line.includes('оружие: 30')) {
+							gun = "ak47";
+						} else if (line.includes('оружие: 33')) {
+							gun = "rifle";
+						}
+						
+						
+						if (line.includes('часть тела: 3')) {
+							BodyPart = "туловище";
+						} else if (line.includes('часть тела: 4')) {
+							BodyPart = "пах";
+						} else if (line.includes('часть тела: 5')) {
+							BodyPart = "левую руку";
+						} else if (line.includes('часть тела: 6')) {
+							BodyPart = "правую руку";
+						} else if (line.includes('часть тела: 7')) {
+							BodyPart = "левую ногу";
+						} else if (line.includes('часть тела: 8')) {
+							BodyPart = "правую ногу";
+						} else if (line.includes('часть тела: 9')) {
+							BodyPart = "голову";
+						} 
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+						formattedLine = `<span style="color: #A9A9A9;">${lineWithoutTime}</span> <span style="color: #BC8F8F; -moz-text-shadow:0 0 10px #c00; -webkit-text-shadow:0 0 10px #c00; text-shadow:0 0 10px #c00;">(из ${gun} в ${BodyPart})</span>`;
+					}
+				}
 
 				// Если строка не пуста и уникальна, отображаем её
 				if (formattedLine && !uniqueLines.has(formattedLine)) {
