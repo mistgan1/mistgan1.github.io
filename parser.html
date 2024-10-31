@@ -330,24 +330,95 @@
 					if (line.includes('Атака от:')) {
 						let BodyPart = "";
 						let gun = "???";
+						let gunPic = "";
 						
 						
-						if (line.includes('оружие: 31')) {
-							gun = "m4";
-						} else if (line.includes('оружие: 38')) {
-							gun = "minigun";
-						} else if (line.includes('оружие: 34')) {
-							gun = "sniper rifle";
+						if (line.includes('оружие: 0')) {
+							gun = "кулак";
+							gunPic = "icons/fist.png";
+						} else if (line.includes('оружие: 1')) {
+							gun = "кастет";
+						} else if (line.includes('оружие: 2')) {
+							gun = "клюшка";
+							gunPic = "icons/golfclub.png";
+						} else if (line.includes('оружие: 3')) {
+							gun = "дубинка";
+							gunPic = "icons/nightstick.png";
+						} else if (line.includes('оружие: 4')) {
+							gun = "нож";
+							gunPic = "icons/knife.png";
+						} else if (line.includes('оружие: 5')) {
+							gun = "бита";
+							gunPic = "icons/bat.png";
+						} else if (line.includes('оружие: 6')) {
+							gun = "лопата";
+							gunPic = "icons/shovel.png";
+						} else if (line.includes('оружие: 7')) {
+							gun = "кий";
+							gunPic = "icons/poolcue.png";
+						} else if (line.includes('оружие: 8')) {
+							gun = "катана";
+							gunPic = "icons/katana.png";
+						} else if (line.includes('оружие: 9')) {
+							gun = "бензопила";
+							gunPic = "icons/chainsaw.png";
+						} else if (line.includes('оружие: 16')) {
+							gun = "граната";
+							gunPic = "icons/grenade.png";
+						} else if (line.includes('оружие: 17')) {
+							gun = "газ";
+							gunPic = "icons/teargas.png";
+						} else if (line.includes('оружие: 18')) {
+							gun = "коктейль Молотова";
+							gunPic = "icons/molotov.png";
+						} else if (line.includes('оружие: 22')) {
+							gun = "пистолет 9мм";
+							gunPic = "icons/9mm.png";
+						} else if (line.includes('оружие: 23')) {
+							gun = "пистолет с глушителем";
+							gunPic = "icons/silenced.png";
+						} else if (line.includes('оружие: 24')) {
+							gun = "дигл";
+							gunPic = "icons/deserteagle.png";
+						} else if (line.includes('оружие: 25')) {
+							gun = "дробовик";
+							gunPic = "icons/shotgun.png";
+						} else if (line.includes('оружие: 26')) {
+							gun = "обрез";
+							gunPic = "icons/sawedoff.png";
+						} else if (line.includes('оружие: 27')) {
+							gun = "скорострельный дробовик";
+							gunPic = "icons/spas12.png";
 						} else if (line.includes('оружие: 28')) {
-							gun = "uzi";
-						} else if (line.includes('оружие: 32')) {
-							gun = "tec9";
+							gun = "УЗИ";
+							gunPic = "icons/uzi.png";
 						} else if (line.includes('оружие: 29')) {
-							gun = "mp5";
+							gun = "МП5";
+							gunPic = "icons/mp5.png";
 						} else if (line.includes('оружие: 30')) {
-							gun = "ak47";
+							gun = "калашников";
+							gunPic = "icons/ak47.png";
+						} else if (line.includes('оружие: 31')) {
+							gun = "эмочка";
+							gunPic = "icons/m4.png";
+						} else if (line.includes('оружие: 32')) {
+							gun = "Тек9";
+							gunPic = "icons/tec9.png";
 						} else if (line.includes('оружие: 33')) {
-							gun = "rifle";
+							gun = "ружьё";
+							gunPic = "icons/rifle.png";
+						} else if (line.includes('оружие: 34')) {
+							gun = "снайпа";
+							gunPic = "icons/sniper.png";
+						} else if (line.includes('оружие: 38')) {
+							gun = "миник";
+							gunPic = "icons/minigun.png";
+						} else if (line.includes('оружие: 14')) {
+							gun = "букет цветов";
+							gunPic = "icons/flowers.png";
+						} else if (line.includes('оружие: 15')) {
+							gun = "трость";
+							gunPic = "icons/cane.png";
 						}
 						
 						
@@ -367,7 +438,8 @@
 							BodyPart = "голову";
 						} 
 						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
-						formattedLine = `<span style="color: #A9A9A9;">${lineWithoutTime}</span> <span style="color: #BC8F8F; -moz-text-shadow:0 0 10px #c00; -webkit-text-shadow:0 0 10px #c00; text-shadow:0 0 10px #c00;">(из ${gun} в ${BodyPart})</span>`;
+						formattedLine = `<span style="color: #A9A9A9;">${lineWithoutTime}</span> <span style="color: #BC8F8F; -moz-text-shadow:0 0 10px #c00; -webkit-text-shadow:0 0 10px #c00; text-shadow:0 0 10px #c00;">(из ${gun} <span><img src=${gunPic} style="width: 28px; height: 28px; vertical-align: middle;"></span> в ${BodyPart})</span>`;
+
 					}
 				}
 
