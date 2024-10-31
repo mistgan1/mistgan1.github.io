@@ -336,12 +336,12 @@
 						if (line.includes('оружие: 0')) {
 							gun = "кулак";
 							gunPic = "icons/fist.png";
-						} else if (line.includes('оружие: 1')) {
+						} else if (line.match(/\bоружие: 1\b/)) {
 							gun = "кастет";
-						} else if (line.includes('оружие: 2')) {
+						} else if (line.match(/\bоружие: 2\b/)) {
 							gun = "клюшка";
 							gunPic = "icons/golfclub.png";
-						} else if (line.includes('оружие: 3')) {
+						} else if (line.match(/\bоружие: 3\b/)) {
 							gun = "дубинка";
 							gunPic = "icons/nightstick.png";
 						} else if (line.includes('оружие: 4')) {
