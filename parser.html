@@ -130,13 +130,14 @@
 		<div class="input-section">
 			<div class="checkboxes">
 				<label><input type="checkbox" id="all-chats">Все чаты</label>
-				<label><input type="checkbox" id="vip-chat">Вип-чат</label>
-				<label><input type="checkbox" id="dark-chat">/ф темные</label>
-				<label><input type="checkbox" id="zombie-chat">/ф зомби</label>
-				<label><input type="checkbox" id="defense-chat">/р защиты</label>
-				<label><input type="checkbox" id="attack-chat" onchange="toggleExclusiveCheckboxes('attack')">/р нападения</label>
-				<label><input type="checkbox" id="zombie-attack-chat" onchange="toggleExclusiveCheckboxes('zombie-attack')">/р нападения только зомби</label>
-				<label><input type="checkbox" id="dark-attack-chat" onchange="toggleExclusiveCheckboxes('dark-attack')">/р нападения только темные</label>
+				<label><input type="checkbox" id="vip-chat">/в чат</label>
+				<label><input type="checkbox" id="light-chat">/ф св</label>
+				<label><input type="checkbox" id="dark-chat">/ф тм</label>
+				<label><input type="checkbox" id="zombie-chat">/ф зм</label>
+				<label><input type="checkbox" id="defense-chat">/р св+хр</label>
+				<label><input type="checkbox" id="attack-chat" onchange="toggleExclusiveCheckboxes('attack')">/р тм+зм</label>
+				<label><input type="checkbox" id="zombie-attack-chat" onchange="toggleExclusiveCheckboxes('zombie-attack')">/р только зм</label>
+				<label><input type="checkbox" id="dark-attack-chat" onchange="toggleExclusiveCheckboxes('dark-attack')">/р только тм</label>
 				<label><input type="checkbox" id="punishments-chat">Наказания</label>
 				<label><input type="checkbox" id="strazhi-chat">Стражи (эфир)</label>
 				<label><input type="checkbox" id="strazhi-answer">Стражи (ответ)</label>
@@ -199,6 +200,7 @@
 			const punishmentsChatChecked = document.getElementById('punishments-chat').checked;
 			const zombieChatChecked = document.getElementById('zombie-chat').checked; // Новый чекбокс для зомби
 			const darkChatChecked = document.getElementById('dark-chat').checked; // Новый чекбокс для темных
+			const lightChatChecked = document.getElementById('light-chat').checked; // Новый чекбокс для светлых
 			const strazhiChatChecked = document.getElementById('strazhi-chat').checked; 
 			const strazhiAnswerChecked = document.getElementById('strazhi-answer').checked; 
 			const attackLogsChecked = document.getElementById('attack-logs').checked; 
@@ -226,7 +228,8 @@
 				if (vipChatChecked && line.includes('VIP-')) {
 					formattedLine = formatVipLine(line);
 				}
-
+				
+				
 				// Проверка на атаки
 				if (attackChatChecked) {
 					const attackRegex = /^\[(.*?)\] \[Р\] {([A-Fa-f0-9]{6})}([^{}]*)({([A-Fa-f0-9]{6})}([^{}]*))?/;
@@ -266,16 +269,27 @@
 				// Проверка на сообщения зомби
 				if (zombieChatChecked) {
 					if (line.includes('[Ф] Зомби') || line.includes('[Ф] Высший Зомби')) {
-						formattedLine = `<span style="color: #6B8E23;">${line}</span>`; // Цвет болотно-зелёный
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+						formattedLine = `<span style="color: #6B8E23;">${lineWithoutTime}</span>`; // Цвет болотно-зелёный
 					}
 				}
 				
 				// Проверка на сообщения темных
 				if (darkChatChecked) {
 					if (line.includes('[Ф] Темный') || line.includes('[Ф] Высший Демон')) {
-						formattedLine = `<span style="color: #556B2F;">${line}</span>`; // болотно-зелёный цвет
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+						formattedLine = `<span style="color: #7FFFD4;">${lineWithoutTime}</span>`; // болотно-зелёный цвет
 					}
 				}
+				
+				// Проверка на сообщения светлых
+				if (lightChatChecked) {
+					if (line.includes('[Ф] Светлый') || line.includes('[Ф] Высший Ангел')) {
+						const lineWithoutTime = line.replace(/^\[\d{2}:\d{2}:\d{2}\] /, '');
+						formattedLine = `<span style="color: #7FFFD4;">${lineWithoutTime}</span>`; // болотно-зелёный цвет
+					}
+				}
+				
 				
 				// Проверка на наказания
 				if (punishmentsChatChecked) {
